@@ -25,6 +25,7 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
 
 /**
  *
@@ -33,8 +34,10 @@ import java.nio.file.WatchService;
 public class Sender  {
        ServerSocket out;
        sNode upper;
+       ArrayList<Socket> connections;
     public Sender(sNode s){
         this.upper = s;  
+        connections = new ArrayList<Socket>();
     }
     
     
@@ -106,7 +109,13 @@ public class Sender  {
         OutputStream out = null;
 
           for (;;) {
-
+     try {
+         connections.add(socket.accept());
+         System.out.println(connections.get(connections.size()-1));
+     } catch (Exception e ) {
+         System.out.println("Failed");
+     }
+     
     // wait for key to be signaled
     WatchKey key;
     try {
@@ -117,7 +126,7 @@ public class Sender  {
 
     for (WatchEvent<?> event: key.pollEvents()) {
         WatchEvent.Kind<?> kind = event.kind();
-
+   
         // This key is registered only
         // for ENTRY_CREATE events,
         // but an OVERFLOW event can
@@ -152,8 +161,9 @@ public class Sender  {
            
             
             try{
+              
                  System.out.println("Entered try");
-                SendThread thread = new SendThread(socket.accept(),s,upper);
+                SendThread thread = new SendThread(connections,s,upper);
                 thread.start();
                 System.out.println("Accepted");
    

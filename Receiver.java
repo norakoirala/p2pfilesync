@@ -13,8 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Scanner;
 
 /**
  *
@@ -22,7 +21,7 @@ import java.nio.file.Paths;
  */
 public class Receiver {
     Socket clientConnection;
-    
+    static int counter = 0;
     public Receiver(){
         
     }
@@ -74,9 +73,12 @@ public void acceptFile(Socket socket, String filename) throws Exception {
                        
                 dir = new File("JavaP2P/oldfiles");
            	dir.mkdir();
-                Files.move(Paths.get("JavaP2P/"+x),Paths.get("JavaP2P/oldfiles/"+x));
-                System.out.println("Detected new file, saving new one as 'filename(number)'");
-                
+             
+            //    Files.move(Paths.get("JavaP2P/"+x),Paths.get("JavaP2P/oldfiles/"+counter+x+));
+                System.out.println("Enter duplicate file name");
+                Scanner input = new Scanner(System.in);
+                x=input.nextLine()+x;
+              
             } 
                            
             OutputStream output = new FileOutputStream("JavaP2P/"+x);

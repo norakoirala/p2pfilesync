@@ -27,7 +27,10 @@ package peertopeer;
    
    public void run () {
        try{
-           s.receive();
+          while(true){
+            s.receive();
+            sleep(15000);
+       }
        } catch ( Exception e) {
            
        }
