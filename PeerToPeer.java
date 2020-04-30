@@ -19,33 +19,30 @@ public class PeerToPeer {
      */
     public static void main(String[] args) throws Exception {
         // TODO code application logic here
+         
         sNode n1 = new sNode(1);
-        sNode n2 = new sNode(2);
-        MyThread server = new MyThread();
-        MyThread client = new MyThread();
-        n1.sender();
-        n2.client();
-        n1.send(n1.sender.accept(),"s.pdf");
-        client.run(n2,2);
-        System.out.println("hello");
-       // server.run(n1,1);
-    
-        
+        new ListenerThread(n1).start();
+        new ReceiverThread(n1).start(); 
        
         
         
     }
     
+    
+    
+    
     public static String encrypt(String input) throws Exception {
     
-           MessageDigest md = MessageDigest.getInstance("SHA-1"); 
+        MessageDigest md = MessageDigest.getInstance("SHA-1"); 
         byte[] messageDigest = md.digest(input.getBytes());
         BigInteger no = new BigInteger(1, messageDigest); 
-         String hashtext = no.toString(16); 
-          while (hashtext.length() < 32) { 
-                hashtext = "0" + hashtext; 
-            } 
-           return hashtext; 
+        String hashtext = no.toString(16); 
+        
+        while (hashtext.length() < 32) { 
+            hashtext = "0" + hashtext; 
+        }
+        
+        return hashtext; 
        
     }
     
