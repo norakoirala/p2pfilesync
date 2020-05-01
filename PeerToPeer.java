@@ -21,8 +21,8 @@ public class PeerToPeer {
         // TODO code application logic here
          
         sNode n1 = new sNode(1);
-      //new ListenerThread(n1).start();
-       new ReceiverThread(n1).start(); 
+      new FolderThread(n1).start();
+    // new ReceiverThread(n1).start(); 
 
         
        

@@ -109,12 +109,10 @@ public class Sender  {
         OutputStream out = null;
 
           for (;;) {
-     try {
-         connections.add(socket.accept());
-         System.out.println(connections.get(connections.size()-1));
-     } catch (Exception e ) {
-         System.out.println("Failed");
-     }
+              
+    ListenerThread lt = new ListenerThread(connections,socket);
+    lt.start();
+    
      
     // wait for key to be signaled
     WatchKey key;
@@ -153,9 +151,15 @@ public class Sender  {
             System.err.println(x);
             continue;
         }
-                
+         
+          System.out.println(connections.toString());
         System.out.println(ev.kind());
+        this.connections = lt.connections;
+        lt.kill();
         if(StandardWatchEventKinds.ENTRY_CREATE == ev.kind()) {
+            
+            
+         
            String s = filename.toString();
            
            
