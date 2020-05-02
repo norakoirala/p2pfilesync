@@ -52,13 +52,12 @@ public class Receiver {
      * @throws Exception
      */
     public void acceptFile(Socket socket, String filename) throws Exception {
-        InputStream in; 
-        int bufferSize = 0; 
-
         try {
+        	System.out.println("Receiving...");
+        	
         	//initialize components
-            bufferSize = socket.getReceiveBufferSize(); 
-            in = socket.getInputStream();
+            int bufferSize = socket.getReceiveBufferSize(); 
+            InputStream in = socket.getInputStream();
             DataInputStream clientData = new DataInputStream(in);
             
             //Displays file name
@@ -79,7 +78,7 @@ public class Receiver {
                 input.close();
             } 
               
-            //writes to file + sends confirmation message
+            //recieves file + confirmation 
             OutputStream output = new FileOutputStream("JavaP2P/" + fileName);
             byte[] buffer = new byte[bufferSize];
             int read;
@@ -88,8 +87,7 @@ public class Receiver {
                 //System.out.println(read);
             }
             output.close();
-            System.out.println("Received");
-
+            System.out.println("Received!");
         } catch (IOException e) {
         	e.printStackTrace();
         }
