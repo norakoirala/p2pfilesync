@@ -38,17 +38,15 @@ public class ListenerThread extends Thread {
 	 * Method runs to scan the network for new connections 
 	 */
 	public void run () {
-       try{
-    	   
+       try {
           //while there are no files changes, accept new connections 
            while(!fileChange){
             Socket tmp; 
             connections.add(tmp = server.accept()); //adds new connection to list of connections 
             System.out.println("Added  new connection: " + tmp); //verifying new connection
            }
-           
        } catch ( Exception e) {
-           
+           e.printStackTrace();
        }
 	}
 	
@@ -58,4 +56,5 @@ public class ListenerThread extends Thread {
 	public void kill(){
        this.fileChange = true;
 	}
+	
 }
