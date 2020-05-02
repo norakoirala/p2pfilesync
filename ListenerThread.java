@@ -29,13 +29,13 @@ public class ListenerThread extends Thread {
 	 */
 	public ListenerThread (ArrayList<Socket> c, ServerSocket s) {
       // The compiler creates the byte code equivalent of super ();
-		this.server =s;
+		this.server = s;
 		this.connections = c;
 	}
 	
 
 	/**
-	 * Method runs to scan the network for new connections 
+	 * Method runs thread to scan the network for new connections 
 	 */
 	public void run () {
        try {

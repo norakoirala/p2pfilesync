@@ -26,7 +26,7 @@ public class FolderThread extends Thread {
 	}
 	
 	/**
-	 *  Method runs to check for new changes to the folder 
+	 *  Method runs thread to check for new changes to the folder 
 	 */
 	public void run () {
        try {
