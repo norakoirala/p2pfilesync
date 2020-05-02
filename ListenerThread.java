@@ -7,6 +7,7 @@ import java.util.ArrayList;
 /**
  *
  * @author RJ
+ * @author Nora
  * Listener thread scans for new connections
  */
 public class ListenerThread extends Thread {

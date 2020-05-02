@@ -32,7 +32,7 @@ public class Receiver {
     public Socket client() {
         try{
            System.out.println("beep");
-           clientConnection = new Socket("25.124.176.85", 4321);
+           clientConnection = new Socket("25.124.176.158", 4321);
            System.out.println("beep");
 
           } catch (UnknownHostException e) {

@@ -18,16 +18,11 @@ public class PeerToPeer {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        // TODO code application logic here
-         
-        sNode n1 = new sNode(1);
-      new FolderThread(n1).start();
-    // new ReceiverThread(n1).start(); 
-
-        
-       
-        
-        
+		// TODO code application logic here
+		     
+		sNode n1 = new sNode(1);
+		new FolderThread(n1).start();
+		// new ReceiverThread(n1).start(); 
     }
     
     
