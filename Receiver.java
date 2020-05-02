@@ -1,8 +1,3 @@
- /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package peertopeer;
 
 import java.io.DataInputStream;
@@ -18,92 +13,88 @@ import java.util.Scanner;
 /**
  *
  * @author RJ
+ * @author Nora
+ * Receiver receives the files from a client 
  */
 public class Receiver {
-    Socket clientConnection;
-    static int counter = 0;
+	
+    Socket clientConnection; //the client that gets connected 
+    
+    /*
+     * Default Constructor
+     */
     public Receiver(){
         
     }
     
-    
-    
-    
+    /**
+     * Method connects to the client
+     * @return - the client socket 
+     */
     public Socket client() {
-        try{
-           System.out.println("beep");
-           clientConnection = new Socket("25.124.176.158", 4321);
-           System.out.println("beep");
-
-          } catch (UnknownHostException e) {
-            System.out.println("Unknown host: kq6py");
-            System.exit(1);
-          } catch  (IOException e) {
-            System.out.println(e.toString());
-            System.exit(1);
-          }
+		try {
+		   clientConnection = new Socket("25.124.176.158", 4321);
+		   System.out.println("Connection Established!");
+		} catch (UnknownHostException e) {
+		    System.out.println("Unknown host: kq6py");
+		    System.exit(1);
+		} catch  (IOException e) {
+		    System.out.println(e.toString());
+		    System.exit(1);
+		} 
      
-      return clientConnection;
-
-        
+		return clientConnection;
     }
-    
-
-    
-
-    
-public void acceptFile(Socket socket, String filename) throws Exception {
-     
-        InputStream in;
-        int bufferSize=0;
+ 
+    /**
+     * Method ensures that file 
+     * @param socket - the socket receiving the file
+     * @param filename
+     * @throws Exception
+     */
+    public void acceptFile(Socket socket, String filename) throws Exception {
+        InputStream in; 
+        int bufferSize = 0; 
 
         try {
-              
-            bufferSize=socket.getReceiveBufferSize();
-            in=socket.getInputStream();
+        	//initialize components
+            bufferSize = socket.getReceiveBufferSize(); 
+            in = socket.getInputStream();
             DataInputStream clientData = new DataInputStream(in);
-            String x;
-            System.out.println(x = clientData.readUTF());
-         
+            
+            //Displays file name
+            String fileName = clientData.readUTF();
+            System.out.println("File: " + fileName);
+            
+            //Makes directory + creates file
             File dir = new File("JavaP2P");
             if(!dir.exists()) dir.mkdir();
-            File tmp = new File("JavaP2P/"+x);
+            File tmp = new File("JavaP2P/" + fileName);
             
+            //Handles duplicate files 
             if(tmp.exists()) {
-                       
-                dir = new File("JavaP2P/oldfiles");
-           	dir.mkdir();
-             
-            //    Files.move(Paths.get("JavaP2P/"+x),Paths.get("JavaP2P/oldfiles/"+counter+x+));
+            	//TODO implement the function that chooses the most recently modified file 
                 System.out.println("Enter duplicate file name");
                 Scanner input = new Scanner(System.in);
-                x=input.nextLine()+x;
-              
+                fileName = input.nextLine() + fileName;
+                input.close();
             } 
-                           
-            OutputStream output = new FileOutputStream("JavaP2P/"+x);
+              
+            //writes to file + sends confirmation message
+            OutputStream output = new FileOutputStream("JavaP2P/" + fileName);
             byte[] buffer = new byte[bufferSize];
             int read;
-            System.out.println("Hello");
             while((read = clientData.read(buffer)) != 1){
                 output.write(buffer, 0, read);
-                    System.out.println(read);
+                //System.out.println(read);
             }
-          
-           output.flush();
-            
+            output.close();
+            System.out.println("Received");
 
         } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-       
-
-      System.out.println("Received");
-    
-    }
-
-        
+        	e.printStackTrace();
+        }
+    }   
 }
 
 
