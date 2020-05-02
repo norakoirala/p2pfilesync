@@ -5,10 +5,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- *
+ * Listener thread scans for new connections
  * @author RJ
  * @author Nora
- * Listener thread scans for new connections
  */
 public class ListenerThread extends Thread {
 
@@ -34,7 +33,8 @@ public class ListenerThread extends Thread {
 		this.connections = c;
 	}
 	
-	/*
+
+	/**
 	 * Method runs to scan the network for new connections 
 	 */
 	public void run () {
@@ -49,9 +49,9 @@ public class ListenerThread extends Thread {
            e.printStackTrace();
        }
 	}
-	
-	/*
-	 * Method switches boolean to stop scanning the network because a file was addded, removed, updated
+
+	/**
+	 *  Method switches boolean to stop scanning the network because a file was addded, removed, updated
 	 */
 	public void kill(){
        this.fileChange = true;

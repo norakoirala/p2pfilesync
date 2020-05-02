@@ -4,10 +4,9 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 
 /**
- *
+ * PeerToPeer runs the main method, has hashing function
  * @author RJ
  * @author Nora
- * PeerToPeer runs the main method, has hashing function
  */
 public class PeerToPeer {
 

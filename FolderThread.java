@@ -1,16 +1,15 @@
 package peertopeer;
 
 /**
- *
+ * FolderThread scans for changes in the file folder
  * @author RJ
  * @author Nora
- * FolderThread scans for changes in the file folder
  */
 public class FolderThread extends Thread {
 	
 	sNode s; //the node detecting file changes 
     
-	/*
+	/**
 	 * Default Constructor
 	 */
 	FolderThread () {
@@ -26,8 +25,8 @@ public class FolderThread extends Thread {
       this.s = sn;
 	}
 	
-	/*
-	 * Method runs to check for new changes to the folder 
+	/**
+	 *  Method runs to check for new changes to the folder 
 	 */
 	public void run () {
        try {
