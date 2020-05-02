@@ -11,9 +11,10 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 /**
- * Receiver receives the files from a client 
+ *
  * @author RJ
  * @author Nora
+ * Receiver receives the files from a client 
  */
 public class Receiver {
 	
@@ -48,7 +49,7 @@ public class Receiver {
     /**
      * Method ensures that file 
      * @param socket - the socket receiving the file
-     * @param filename
+     * @param filename - the name of the file being received 
      * @throws Exception
      */
     public void acceptFile(Socket socket, String filename) throws Exception {
@@ -93,8 +94,6 @@ public class Receiver {
         } catch (IOException e) {
         	e.printStackTrace();
         }
-    }
+    } 
     
 }
-
-
