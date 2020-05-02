@@ -11,10 +11,9 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 /**
- *
+ * Receiver receives the files from a client 
  * @author RJ
  * @author Nora
- * Receiver receives the files from a client 
  */
 public class Receiver {
 	
@@ -94,7 +93,8 @@ public class Receiver {
         } catch (IOException e) {
         	e.printStackTrace();
         }
-    }   
+    }
+    
 }
 
 
