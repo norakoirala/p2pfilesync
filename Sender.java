@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package peertopeer;
 
 import java.io.BufferedInputStream;
@@ -28,187 +23,172 @@ import java.nio.file.WatchService;
 import java.util.ArrayList;
 
 /**
- *
+ * Sender sends the file to a client
  * @author RJ
+ * @author Nora
  */
-public class Sender  {
-       ServerSocket out;
-       sNode upper;
-       ArrayList<Socket> connections;
+public class Sender {
+	
+	sNode n; //node sending the file
+	ArrayList<Socket> connections; //list of all connections to send to 
+    
+	/**
+	 * Overloaded constructor
+	 * @param s - the node sending the file
+	 */
     public Sender(sNode s){
-        this.upper = s;  
+        this.n = s;  
         connections = new ArrayList<Socket>();
     }
     
-    
-      public void send(Socket socket, String filename) throws Exception {
-   System.out.println("sending");
-   final File myFile= new File("subfolder/"
-           + filename); //sdcard/DCIM.JPG
-   
-        byte[] mybytearray = new byte[(int)myFile.length()];
-        FileInputStream fis = new FileInputStream(myFile);  
-        BufferedInputStream bis = new BufferedInputStream(fis);
-        DataInputStream dis = new DataInputStream(bis);
-        OutputStream os;
-        
-        try {
-
-            os = socket.getOutputStream();
+    /**
+     * Sends file to client socket
+     * @param socket - client socket
+     * @param filename - file to send
+     * @throws Exception
+     */
+    public void send(Socket socket, String filename) throws Exception {
+    	try {
+        	System.out.println("Sending...");
+        	
+        	//initialize components
+        	final File myFile = new File("FileDrop/" + filename); //sdcard/DCIM.JPG 
+    		byte[] mybytearray = new byte[(int)myFile.length()];
+    		FileInputStream fis = new FileInputStream(myFile);  
+    		BufferedInputStream bis = new BufferedInputStream(fis);
+    		DataInputStream dis = new DataInputStream(bis);
+    		OutputStream os = socket.getOutputStream();
             DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(myFile.getName());     
+            
+            //names file, sends it + confirmation
+            dos.writeUTF(myFile.getName()); 
             dos.writeLong(mybytearray.length);
             int read;
-            System.out.println("stuck");
             while((read = dis.read(mybytearray)) != -1){
-                            System.out.println("stuck1");
                 dos.write(mybytearray, 0, read);
             }
-
-          dos.writeByte(-1);
-          dos.flush();
-
-
+			dos.writeByte(-1);
+			dos.flush();
+			System.out.println("Sent!");
         } catch (IOException e) {
-
             e.printStackTrace();
         }
-    
+    }
 
-
-        System.out.println("Finished sending");
-}
-
-    
-    
+    /**
+     * Method used for drag and drop of files 
+     * @param socket
+     * @throws Exception
+     */
     public void watch (ServerSocket socket) throws Exception {
-     
-     
-          WatchService watcher = FileSystems.getDefault().newWatchService();
-          new File("subfolder").mkdir();
-          Path dir = Paths.get("subfolder");
-          
-          try {
-                WatchKey key = dir.register(watcher,
-                                       ENTRY_CREATE,
-                                       ENTRY_DELETE,
-                                       ENTRY_MODIFY);
-            } catch (IOException x) {
-                System.err.println(x);
-            }
-          
-          
-          
-          System.out.println("hello");
-         
-        
-        ServerSocket server = null;
-     
+		WatchService watcher = FileSystems.getDefault().newWatchService();
+		new File("FileDrop").mkdir();
+		Path dir = Paths.get("FileDrop");
+		          
+		try {
+			WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+		} catch (IOException x) {
+			System.err.println(x);
+		}
 
-        String line = null;
+		ServerSocket server = null;
+		String line = null;
         OutputStream out = null;
-
-          for (;;) {
-              
-    ListenerThread lt = new ListenerThread(connections,socket);
-    lt.start();
+        
+        for (;;) {
+        	ListenerThread lt = new ListenerThread(connections,socket);
+        	lt.start();
     
      
-    // wait for key to be signaled
-    WatchKey key;
-    try {
-        key = watcher.take();
-    } catch (InterruptedException x) {
-        return;
-    }
+		    // wait for key to be signaled
+		    WatchKey key;
+		    try {
+		        key = watcher.take();
+		    } catch (InterruptedException x) {
+		        return;
+		    }
 
-    for (WatchEvent<?> event: key.pollEvents()) {
-        WatchEvent.Kind<?> kind = event.kind();
-   
-        // This key is registered only
-        // for ENTRY_CREATE events,
-        // but an OVERFLOW event can
-        // occur regardless if events
-        // are lost or discarded.
-        if (kind == OVERFLOW) {
-            continue;
-        }
+		    for (WatchEvent<?> event: key.pollEvents()) {
+		        WatchEvent.Kind<?> kind = event.kind();
+		   
+		        // This key is registered only
+		        // for ENTRY_CREATE events,
+		        // but an OVERFLOW event can
+		        // occur regardless if events
+		        // are lost or discarded.
+		        if (kind == OVERFLOW) {
+		            continue;
+		        }
 
-        // The filename is the
-        // context of the event.
-        WatchEvent<Path> ev = (WatchEvent<Path>)event;
-        Path filename = ev.context();
-        System.out.println(filename);
-        // Verify that the new
-        //  file is a text file.
-        try {
-            // Resolve the filename against the directory.
-            // If the filename is "test" and the directory is "foo",
-            // the resolved name is "test/foo".
-            Path child = dir.resolve(filename);
-           
-        } catch (Exception x) {
-            System.err.println(x);
-            continue;
-        }
-         
-          System.out.println(connections.toString());
-        System.out.println(ev.kind());
-        this.connections = lt.connections;
-        lt.kill();
-        if(StandardWatchEventKinds.ENTRY_CREATE == ev.kind()) {
-            
-            
-         
-           String s = filename.toString();
+		        // The filename is the
+		        // context of the event.
+		        WatchEvent<Path> ev = (WatchEvent<Path>)event;
+		        Path filename = ev.context();
+		        System.out.println(filename);
+		        // Verify that the new
+		        //  file is a text file.
+		        try {
+		            // Resolve the filename against the directory.
+		            // If the filename is "test" and the directory is "foo",
+		            // the resolved name is "test/foo".
+		            Path child = dir.resolve(filename);
+		           
+		        } catch (Exception x) {
+		            System.err.println(x);
+		            continue;
+		        }
+		         
+		        System.out.println(connections.toString());
+		        System.out.println(ev.kind());
+		        this.connections = lt.connections;
+		        lt.kill();
+		        if(StandardWatchEventKinds.ENTRY_CREATE == ev.kind()) {         
+		        	String s = filename.toString();
            
            
             
-            try{
-              
-                 System.out.println("Entered try");
-                SendThread thread = new SendThread(connections,s,upper);
-                thread.start();
-                System.out.println("Accepted");
-   
-              
+	            try{
+	              
+	                 System.out.println("Entered try");
+	                SendThread thread = new SendThread(connections,s,n);
+	                thread.start();
+	                System.out.println("Accepted");
+	   
+	              
+	
+	            } catch (Exception e) {
+	               e.printStackTrace();
+	             }   
 
-            } catch (Exception e) {
-               e.printStackTrace();
-             }   
+		       }
+		       
+		    }
 
-       }
-       
+		    boolean valid = key.reset();
+		    if (!valid) {
+		        break;
+		    }
+		}
     }
-
-    boolean valid = key.reset();
-    if (!valid) {
-        break;
-    }
-}
-
     
-    
-}
-    
-    
+    /**
+     * Tests the connection of the sender
+     * @return - the sender server 
+     * @throws Exception
+     */
     public ServerSocket sender() throws Exception {
-    
         ServerSocket server = null;
-        String line = null;
        
-        try{
-           
+        try {
             System.out.println("beep1");
             server = new ServerSocket(4321); 
         }
-        catch (IOException e) {
-             
-            System.out.println(e);
+        catch (IOException e) { 
+        	e.getStackTrace();
             System.exit(-1);
         }
     
-      return server;
-     
+        return server;
     }
+    
 }
