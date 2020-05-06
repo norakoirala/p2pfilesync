@@ -34,6 +34,7 @@ public class Receiver {
 		try {
 		   clientConnection = new Socket("25.124.176.158", 4321);
 		   System.out.println("Connection Established!");
+		   
 		} catch (UnknownHostException e) {
 		    System.out.println("Unknown host: kq6py");
 		    System.exit(1);
@@ -73,7 +74,7 @@ public class Receiver {
             
             System.out.println("File in dir: " + tmp.lastModified() + "\nFile coming in : " + time);
             //Handles duplicate files 
-            if(tmp.exists() && (tmp.lastModified() >= time)) {
+            if(tmp.exists() && tmp.lastModified() >= time) {
     			System.out.println("Most recent version of:" + fileName + " already exists!");
             } else {
                 //Receives file + confirmation 
@@ -83,7 +84,7 @@ public class Receiver {
                 while((read = clientData.read(buffer)) != 1){
                     output.write(buffer, 0, read);
                 }
-                output.close();
+                output.flush();
                 System.out.println("Received File: " + fileName);
                 tmp.setLastModified(time);
             }
