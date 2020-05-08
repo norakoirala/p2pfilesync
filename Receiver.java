@@ -1,5 +1,7 @@
 package peertopeer;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,9 +34,9 @@ public class Receiver {
      */
     public Socket client() {
 		try {
-		   clientConnection = new Socket("25.124.176.158", 4321);
+		   System.out.println("Establishing connection...");
+		   clientConnection = new Socket("25.14.231.10", 4321);
 		   System.out.println("Connection Established!");
-		   
 		} catch (UnknownHostException e) {
 		    System.out.println("Unknown host: kq6py");
 		    System.exit(1);
@@ -53,41 +55,49 @@ public class Receiver {
      */
     public void acceptFile(Socket socket) throws Exception {
         try {
-        	//System.out.println("Receiving...");
-        	
-        	//initialize components
-            int bufferSize = socket.getReceiveBufferSize(); 
-            InputStream in = socket.getInputStream();
-            DataInputStream clientData = new DataInputStream(in);
-        	long time = clientData.readLong();
-   
+        	//setting up streams to accept files
+            BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
+            DataInputStream dis = new DataInputStream(bis);
             
-            //Displays file name
-            String fileName = clientData.readUTF();
-            System.out.println("Recieving File: " + fileName);
-            
-            //Makes directory + creates file
-            File dir = new File("JavaP2P");
+            //Makes directory to put files in
+            File dir = new File("FileDrop");
             if(!dir.exists()) dir.mkdir();
-            File tmp = new File("JavaP2P/" + fileName);
             
+            //Receiving number of files
+            int numFiles = dis.readInt();
+            System.out.println("Receiving " + numFiles + " files...");
             
-            System.out.println("File in dir: " + tmp.lastModified() + "\nFile coming in : " + time);
-            //Handles duplicate files 
-            if(tmp.exists() && tmp.lastModified() >= time) {
-    			System.out.println("Most recent version of:" + fileName + " already exists!");
-            } else {
-                //Receives file + confirmation 
-                OutputStream output = new FileOutputStream("JavaP2P/" + fileName);
-                byte[] buffer = new byte[bufferSize];
-                int read;
-                while((read = clientData.read(buffer)) != 1){
-                    output.write(buffer, 0, read);
+            //Writing each file
+            for (int i = 0; i < numFiles; i++) {
+            	//receiving metadata
+            	long time = dis.readLong();
+            	long length = dis.readLong();
+            	String name = dis.readUTF();
+            	
+            	//creating file
+            	File tmp = new File("FileDrop/" + name);
+            	System.out.println("Receiving File #" + i + ": " + name);
+            	
+            	//checking duplicates
+                if(tmp.exists() && (tmp.lastModified() >= time)) {
+        			System.out.println("Most recent version of:" + name + " already exists!");
+                } else {
+                    //Receives file + confirmation 
+                    tmp.setLastModified(time);
+                    FileOutputStream fos = new FileOutputStream("FileDrop/" + name, false);
+                    BufferedOutputStream bos = new BufferedOutputStream(fos);
+                    //byte[] buffer = new byte[bufferSize];
+                    int read = 0;
+                    while(read < length) {
+                        bos.write(bis.read());
+                        read++;
+                    }
+                    bos.close();
+                    System.out.println("Received File #" + i + ": " + name);
                 }
-                output.flush();
-                System.out.println("Received File: " + fileName);
-                tmp.setLastModified(time);
-            }
+                
+                dis.close();
+            }            
         } catch (IOException e) {
         	e.printStackTrace();
         }
