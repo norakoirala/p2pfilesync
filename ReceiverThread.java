@@ -23,6 +23,7 @@ public class ReceiverThread extends Thread {
      public ReceiverThread (sNode sn) {
       // The compiler creates the byte code equivalent of super ();
       this.s = sn;
+      s.establish();
      }
      
      /**

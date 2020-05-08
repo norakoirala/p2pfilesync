@@ -9,8 +9,8 @@ import java.util.ArrayList;
  * @author Nora
  */
  public class SendThread extends Thread {
-	String fileName; //the file being sent
 	sNode s; 
+	String fn; //file name
 	ArrayList<Socket> connections; //the list of all the connections on the network
 	
 	/**
@@ -34,10 +34,10 @@ import java.util.ArrayList;
 	 * @param st - the file name 
 	 * @param sn
 	 */
-	public SendThread (ArrayList<Socket> cn, String st ,sNode sn) {
+	public SendThread (ArrayList<Socket> cn, String fn, sNode sn) {
 		// The compiler creates the byte code equivalent of super ();
-		this.fileName = st;
 		this.s = sn;
+		this.fn = fn;
 		this.connections = cn;
 	}
 	/**
@@ -45,9 +45,11 @@ import java.util.ArrayList;
 	 */
 	public void run () {
 		try{
-			for(Socket s : connections){ //sends file to connections
-				this.s.outgoing.send(s,fileName); 
-				System.out.println("Sending to... " +  s);
+			
+			for(Socket socket : connections){ //sends file to connections
+				s.join(socket);
+//				System.out.println("Sending to: " +  s);
+//				this.s.outgoing.sendFile(s, fn);
 			}
        } catch ( Exception e) {
            e.printStackTrace();

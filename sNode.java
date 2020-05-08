@@ -12,6 +12,7 @@ public class sNode {
 	
     Sender outgoing; 
     Receiver incoming;
+    Socket cl;
     int nodeNum;
     
     /**
@@ -20,6 +21,11 @@ public class sNode {
      */
     public sNode(int n){
         this.nodeNum = n;
+    }
+    
+    public void join(Socket s) throws Exception {
+    	outgoing = new Sender(this);
+    	outgoing.join(s);
     }
     
     /**
@@ -32,14 +38,22 @@ public class sNode {
     }
     
     /**
+     * Method establishes connection
+     */
+    public void establish(){
+        incoming = new Receiver();
+        this.cl = incoming.client();
+    }
+    
+    /**
      * Method receives files
      * @throws Exception
      */
-    public void receive() throws Exception{
-        incoming = new Receiver();
-        Socket cl = incoming.client();
-        System.out.println("Broken?");
-        incoming.acceptFile(cl,"s.pdf");
+    
+    public void receive() throws Exception {
+        incoming.acceptFile(cl);
     }
+
+
     
 }

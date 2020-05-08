@@ -43,12 +43,11 @@ public class Sender {
     }
     
     /**
-     * Sends file to client socket
+     * Sends all the files to client socket
      * @param socket - client socket
-     * @param filename - file to send
      * @throws Exception
      */
-    public void send(Socket socket, String filename) throws Exception {
+    public void join(Socket socket) throws Exception {
     	try {        	
     		//setting up the streams to send files
     		BufferedOutputStream os = new BufferedOutputStream(socket.getOutputStream());
@@ -93,6 +92,34 @@ public class Sender {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    }
+    
+    public void sendFile(Socket socket, String filename) throws Exception {
+    	try {
+        	System.out.println("Sending...");
+        	
+        	//initialize components
+        	final File myFile = new File("FileDrop/" + filename); //sdcard/DCIM.JPG 
+    		byte[] mybytearray = new byte[(int)myFile.length()];
+    		FileInputStream fis = new FileInputStream(myFile);  
+    		BufferedInputStream bis = new BufferedInputStream(fis);
+    		DataInputStream dis = new DataInputStream(bis);
+    		OutputStream os = socket.getOutputStream();
+            DataOutputStream dos = new DataOutputStream(os);
+            
+            //names file, sends it + confirmation
+            dos.writeUTF(myFile.getName()); 
+            dos.writeLong(mybytearray.length);
+            int read;
+            while((read = dis.read(mybytearray)) != -1){
+                dos.write(mybytearray, 0, read);
+            }
+			dos.writeByte(-1);
+			dos.flush();
+			System.out.println("Sent!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -170,7 +197,7 @@ public class Sender {
 	            try{
 	              
 	                 System.out.println("Entered try");
-	                SendThread thread = new SendThread(connections,s,n);
+	                 SendThread thread = new SendThread(connections,s,n);
 	                thread.start();
 	                System.out.println("Accepted");
 	   
