@@ -1,6 +1,7 @@
 package peertopeer;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -48,31 +49,50 @@ public class Sender {
      * @throws Exception
      */
     public void send(Socket socket, String filename) throws Exception {
-    	try {
-        	System.out.println("Sending...");
-        	
-        	//initialize components
-        	final File myFile = new File("FileDrop/" + filename); //sdcard/DCIM.JPG 
-    		byte[] mybytearray = new byte[(int)myFile.length()];
-    		FileInputStream fis = new FileInputStream(myFile);  
-    		BufferedInputStream bis = new BufferedInputStream(fis);
-    		DataInputStream dis = new DataInputStream(bis);
-    		OutputStream os = socket.getOutputStream();
+    	try {        	
+    		//setting up the streams to send files
+    		BufferedOutputStream os = new BufferedOutputStream(socket.getOutputStream());
             DataOutputStream dos = new DataOutputStream(os);
-            
-            //names file, sends it + confirmation
-            dos.writeUTF(myFile.getName()); 
-            dos.writeLong(mybytearray.length);
-            int read;
-            while((read = dis.read(mybytearray)) != -1){
-                dos.write(mybytearray, 0, read);
-            }
-			dos.writeByte(-1);
-			dos.flush();
-			System.out.println("Sent!");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        	
+            //getting all the files from one folder 
+        	File dir = new File("FileDrop/");
+    		File[] fileList = dir.listFiles();
+    		
+    		//adding # of files to output stream
+    		int numFiles = fileList.length;
+    		dos.writeInt(numFiles);
+    		System.out.println("Sending " + numFiles + " files...");
+    		
+    		//sending the files one by one
+    		for(int i = 0; i < numFiles; i++) {
+    			File f = fileList[i];
+    			//adding meta data for each file
+    			long time = f.lastModified();
+    			dos.writeLong(time);
+    			long length = f.length();
+    			dos.writeLong(length);
+    			String name = f.getName();
+    			dos.writeUTF(name);
+    			
+    			//set up streams
+        		FileInputStream fis = new FileInputStream(f);  
+        		BufferedInputStream bis = new BufferedInputStream(fis);
+        		System.out.println("Sending File #" + i + ": " + name);
+    			
+        		//write files
+                int read;
+                while((read = bis.read()) > -1) { 
+                    dos.write(read);
+                }
+                System.out.println("Sent File #" + i + ": " + name);
+                bis.close();
+    		}
+    		
+    		dos.close();
+    		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 
     /**
@@ -180,8 +200,9 @@ public class Sender {
         ServerSocket server = null;
        
         try {
-            System.out.println("beep1");
+            System.out.println("Setting up sender...");
             server = new ServerSocket(4321); 
+            System.out.println("Sender ready!");
         }
         catch (IOException e) { 
         	e.getStackTrace();
