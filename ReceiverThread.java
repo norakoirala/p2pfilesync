@@ -48,64 +48,8 @@ public class ReceiverThread extends Thread {
  			if(bootstrap == null && !s.master)  {
 				System.out.println("Bootstrap Node Connecting...");
 				this.bootstrap = new Socket("25.124.176.158",4321);
-				System.out.println("Bootstrap Node:" + bootstrap + "Connected!");
-			        	//setting up streams to accept files
-			            BufferedInputStream bis = new BufferedInputStream(bootstrap.getInputStream());
-			            DataInputStream dis = new DataInputStream(bis);
+				System.out.println("Bootstrap Node:" + bootstrap + "Connected!");         
 			            
-			            //Makes directory to put files in
-			            File dir = new File("FileDrop");
-			            if(!dir.exists()) dir.mkdir();
-			            
-			           
-			 
-			            
-			            //Receiving number of files
-			            String file = dis.readUTF();
-			            System.out.println(file);
-			            if (file.equals("File")) {
-				            int numFiles = dis.readInt();
-				            System.out.println(numFiles);
-				            if(numFiles > 0) {
-				            	 System.out.println("Receiving " + numFiles + " files...");
-						            
-						            //Writing each file
-						            for (int i = 0; i < numFiles; i++) {
-						            	//receiving metadata
-						            	String f = dis.readUTF();
-						        
-						            		long time = dis.readLong();
-							            	String name = dis.readUTF();
-							            	long length = dis.readLong();
-							            	
-							            	//creating file
-							            	File tmp = new File("FileDrop/" + name);
-							            	System.out.println("Receiving File #" + (i+1) + ": " + name);
-							            	
-							            	//checking duplicates
-							                if(tmp.exists() && (tmp.lastModified() >= time)) {
-							        			System.out.println("Most recent version of:" + name + " already exists!");
-							                } else {
-							                    //Receives file + confirmation 
-							                    tmp.setLastModified(time);
-							                    FileOutputStream fos = new FileOutputStream("FileDrop/" + name, false);
-							                    BufferedOutputStream bos = new BufferedOutputStream(fos);
-							                    //byte[] buffer = new byte[bufferSize];
-							                    int read = 0;
-							                    while(read < length) {
-							                        bos.write(bis.read());
-							                        read++;
-							                    }
-							                    bos.flush();
-							                    System.out.println("Received File #" + (i+1) + ": " + name);
-							                }
-						            	}
-			            }
-			    
-
-					            	
-					            
-			            } 
 		            }
 
 	    	 } catch (Exception e) {
@@ -197,7 +141,7 @@ public class ReceiverThread extends Thread {
                     			System.out.println("Most recent version of:" + fileName + " already exists!");
                             } else {
                                 //Receives file + confirmation 
-                                OutputStream output = new FileOutputStream("JavaP2P/" + fileName);
+                                OutputStream output = new FileOutputStream("File Drop/" + fileName);
                                 byte[] buffer = new byte[bufferSize];
                                 int read;
                                 while((read = clientData.read(buffer)) != 1){
@@ -222,11 +166,6 @@ public class ReceiverThread extends Thread {
      }
      
      
-//     public int findColon(String s) {
-//		for(int i = 0; i < s.length(); i++){
-//		    if(s.charAt(i) == ':') return i; 
-//		}
-//		return -1; 
-//    }
+
 //      
 }
