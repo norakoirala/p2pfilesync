@@ -63,10 +63,12 @@ public class Sender {
             //names file, sends it + confirmation
            
             dos.writeUTF("File");
-            dos.writeInt(1);
+//            dos.writeInt(1);
+           
             dos.writeLong(myFile.lastModified());
-            dos.writeLong(myFile.length());
             dos.writeUTF(myFile.getName()); 
+            dos.writeLong(myFile.length());
+    
             int read;
             while((read = bis.read()) > -1) { 
                 dos.write(read);
