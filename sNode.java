@@ -1,7 +1,9 @@
 package peertopeer;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.Socket;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  * sNode is representation of a node
@@ -12,22 +14,31 @@ public class sNode {
 	
     Sender outgoing; 
     Receiver incoming;
+    Socket cl;
     int nodeNum;
+    Socket bootstrap;
+    ArrayList<Socket> incomingConnections;
+     ArrayList<String> IPList;
+    boolean master;
     
     /**
      * Overloaded constructor
      * @param n - number for the node
      */
-    public sNode(int n){
-        this.nodeNum = n;
+ 
+    public sNode(boolean m){
+        this.master = m;
     }
+    
     
     /**
      * Method sends files
      * @throws Exception
      */
+    
+   
     public void listen() throws Exception {
-        outgoing = new Sender(this);
+       outgoing = new Sender(this);
         outgoing.watch(outgoing.sender());
     }
     
@@ -35,11 +46,19 @@ public class sNode {
      * Method receives files
      * @throws Exception
      */
-    public void receive() throws Exception{
+    
+    public void establish(){
+              System.out.println("Broken?");
         incoming = new Receiver();
-        Socket cl = incoming.client();
-        System.out.println("Broken?");
-        incoming.acceptFile(cl,"s.pdf");
+        this.cl = incoming.client();
     }
+
+    public void receive(Socket cl) throws Exception{
+        
+        System.out.println("Broken?");
+        incoming.acceptFile(cl);
+    }
+    
+
     
 }

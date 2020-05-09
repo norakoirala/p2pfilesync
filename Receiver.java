@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Scanner;
+import java.util.ArrayList;
 
 /**
  * Receiver receives the files from a client 
@@ -32,7 +32,7 @@ public class Receiver {
      */
     public Socket client() {
 		try {
-		   clientConnection = new Socket("25.124.176.158", 4321);
+		   clientConnection = new Socket("192.168.1.10", 4321);
 		   System.out.println("Connection Established!");
 		} catch (UnknownHostException e) {
 		    System.out.println("Unknown host: kq6py");
@@ -48,46 +48,88 @@ public class Receiver {
     /**
      * Method ensures that file 
      * @param socket - the socket receiving the file
-     * @param filename - the name of the file being received 
      * @throws Exception
      */
-    public void acceptFile(Socket socket, String filename) throws Exception {
+    public void acceptFile(Socket socket) throws Exception {
         try {
-        	System.out.println("Receiving...");
+        	//System.out.println("Receiving...");
         	
         	//initialize components
             int bufferSize = socket.getReceiveBufferSize(); 
             InputStream in = socket.getInputStream();
             DataInputStream clientData = new DataInputStream(in);
+        	long time = clientData.readLong();
+   
             
             //Displays file name
             String fileName = clientData.readUTF();
-            System.out.println("File: " + fileName);
+            System.out.println("Recieving File: " + fileName);
             
             //Makes directory + creates file
             File dir = new File("JavaP2P");
             if(!dir.exists()) dir.mkdir();
             File tmp = new File("JavaP2P/" + fileName);
             
+            
+            System.out.println("File in dir: " + tmp.lastModified() + "\nFile coming in : " + time);
             //Handles duplicate files 
-            if(tmp.exists()) {
-            	//TODO implement the function that chooses the most recently modified file 
-                System.out.println("Enter duplicate file name");
-                Scanner input = new Scanner(System.in);
-                fileName = input.nextLine() + fileName;
-                input.close();
-            } 
-              
-            //recieves file + confirmation 
-            OutputStream output = new FileOutputStream("JavaP2P/" + fileName);
-            byte[] buffer = new byte[bufferSize];
-            int read;
-            while((read = clientData.read(buffer)) != 1){
-                output.write(buffer, 0, read);
-                //System.out.println(read);
+            if(tmp.exists() && (tmp.lastModified() >= time)) {
+    			System.out.println("Most recent version of:" + fileName + " already exists!");
+            } else {
+                //Receives file + confirmation 
+                OutputStream output = new FileOutputStream("JavaP2P/" + fileName);
+                byte[] buffer = new byte[bufferSize];
+                int read;
+                while((read = clientData.read(buffer)) != 1){
+                    output.write(buffer, 0, read);
+                }
+                output.flush();
+                System.out.println("Received File: " + fileName);
+                tmp.setLastModified(time);
             }
-            output.close();
-            System.out.println("Received!");
+        } catch (IOException e) {
+        	e.printStackTrace();
+        }
+    } 
+    
+    
+      public void acceptFiles(Socket socket) throws Exception {
+        try {
+        	//System.out.println("Receiving...");
+        	
+        	//initialize components
+            int bufferSize = socket.getReceiveBufferSize(); 
+            InputStream in = socket.getInputStream();
+            DataInputStream clientData = new DataInputStream(in);
+        	long time = clientData.readLong();
+   
+            
+            //Displays file name
+            String fileName = clientData.readUTF();
+            System.out.println("Recieving File: " + fileName);
+            
+            //Makes directory + creates file
+            File dir = new File("JavaP2P");
+            if(!dir.exists()) dir.mkdir();
+            File tmp = new File("JavaP2P/" + fileName);
+            
+            
+            System.out.println("File in dir: " + tmp.lastModified() + "\nFile coming in : " + time);
+            //Handles duplicate files 
+            if(tmp.exists() && (tmp.lastModified() >= time)) {
+    			System.out.println("Most recent version of:" + fileName + " already exists!");
+            } else {
+                //Receives file + confirmation 
+                OutputStream output = new FileOutputStream("JavaP2P/" + fileName);
+                byte[] buffer = new byte[bufferSize];
+                int read;
+                while((read = clientData.read(buffer)) != 1){
+                    output.write(buffer, 0, read);
+                }
+                output.flush();
+                System.out.println("Received File: " + fileName);
+                tmp.setLastModified(time);
+            }
         } catch (IOException e) {
         	e.printStackTrace();
         }

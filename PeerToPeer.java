@@ -2,6 +2,7 @@ package peertopeer;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.util.Scanner;
 
 /**
  * PeerToPeer runs the main method, has hashing function
@@ -17,9 +18,18 @@ public class PeerToPeer {
     public static void main(String[] args) throws Exception {
 		// TODO code application logic here
 		     
-		sNode n1 = new sNode(1);
-		//new FolderThread(n1).start();
-		 new ReceiverThread(n1).start(); 
+		Scanner in = new Scanner(System.in);
+		sNode n1 = new sNode(false);
+		System.out.println("F OR R?");
+		String s = in.nextLine();
+		
+		if (s.charAt(0) == 'F') {
+			new FolderThread(n1).start();
+		} else if (s.charAt(0) == 'R') {
+			new ReceiverThread(n1).start(); 
+		} else {
+			System.out.println("Invalid input!");
+		}
     }
     
     /**

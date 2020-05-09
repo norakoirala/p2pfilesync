@@ -1,5 +1,8 @@
 package peertopeer;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -38,18 +41,40 @@ public class ListenerThread extends Thread {
 	 * Method runs thread to scan the network for new connections 
 	 */
 	public void run () {
-       try {
+          Socket tmp = null; 
           //while there are no files changes, accept new connections 
            while(!fileChange){
-            Socket tmp; 
-            connections.add(tmp = server.accept()); //adds new connection to list of connections 
-            System.out.println("Added  new connection: " + tmp); //verifying new connection
-           }
-       } catch ( Exception e) {
-           e.printStackTrace();
-       }
+                 
+               try {
+                   System.out.println("Attempting to add");
+            connections.add(tmp = server.accept());
+               } catch (Exception e) {
+                   System.out.println("Couldnt add ");
+               }//adds new connection to list of connections 
+          if(connections.size() > 1){
+            {
+           for(Socket c : connections) {
+                 try {
+                 System.out.println("Sending peers to " + c.toString());
+                DataOutputStream dos = new DataOutputStream(c.getOutputStream());
+                 for(Socket co : connections) {
+                     if(c == co ) continue;
+                     dos.writeUTF(co.getRemoteSocketAddress().toString());
+                 }
+                  dos.flush();
+                        } catch (Exception e) {
+                  
+                  }
+            }
+   
+             
 	}
-
+   
+        }
+        
+            System.out.println("Added  new connection: " + tmp); //verifying new connection
+        }
+        }
 	/**
 	 *  Method switches boolean to stop scanning the network because a file was addded, removed, updated
 	 */

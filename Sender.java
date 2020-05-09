@@ -61,6 +61,7 @@ public class Sender {
             DataOutputStream dos = new DataOutputStream(os);
             
             //names file, sends it + confirmation
+            dos.writeLong(myFile.lastModified());
             dos.writeUTF(myFile.getName()); 
             dos.writeLong(mybytearray.length);
             int read;
@@ -99,7 +100,7 @@ public class Sender {
         	ListenerThread lt = new ListenerThread(connections,socket);
         	lt.start();
     
-     
+                
 		    // wait for key to be signaled
 		    WatchKey key;
 		    try {
@@ -150,6 +151,7 @@ public class Sender {
 	            try{
 	              
 	                 System.out.println("Entered try");
+                  
 	                SendThread thread = new SendThread(connections,s,n);
 	                thread.start();
 	                System.out.println("Accepted");
@@ -189,6 +191,10 @@ public class Sender {
         }
     
         return server;
+    }
+    
+    public void bootStrap (  ) {
+        
     }
     
 }

@@ -39,6 +39,7 @@ import java.util.ArrayList;
 		this.fileName = st;
 		this.s = sn;
 		this.connections = cn;
+            
 	}
 	/**
 	 * Method runs the thread to send files
