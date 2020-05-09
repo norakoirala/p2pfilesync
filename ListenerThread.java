@@ -49,10 +49,10 @@ public class ListenerThread extends Thread {
 		//while there are no files changes, accept new connections 
 		while(!fileChange){
 			try {
-				System.out.println("Attempting to add");
 				connections.add(tmp = server.accept());
 		        System.out.println("Added  new connection: " + tmp); //verifying new connection
 		        
+		        //when connection is accepted, send all the files you have
 		        BufferedOutputStream os = new BufferedOutputStream(tmp.getOutputStream());
 	            DataOutputStream dos = new DataOutputStream(os);
 	        	
@@ -66,7 +66,7 @@ public class ListenerThread extends Thread {
 	    		if(numFiles > 0) {
 	    			dos.writeUTF("File");
 		    		dos.writeInt(numFiles);
-		    		System.out.println("Sending " + numFiles + " files...");
+		    		System.out.println("Sending " + numFiles + " file(s)...");
 		    		
 		    		//sending the files one by one
 		    		for(int i = 0; i < numFiles; i++) {
@@ -74,14 +74,11 @@ public class ListenerThread extends Thread {
 		    			//adding meta data for each file
 		    			long time = f.lastModified();
 		    			dos.writeLong(time);
-		    			String name = f.getName();
-		    			dos.writeUTF(name);
 		    			long length = f.length();
 		    			dos.writeLong(length);
-		    			
+		    			String name = f.getName();
+		    			dos.writeUTF(name);
 		    		
-		    			
-		    			
 		    			//set up streams
 		        		FileInputStream fis = new FileInputStream(f);  
 		        		BufferedInputStream bis = new BufferedInputStream(fis);
@@ -93,18 +90,16 @@ public class ListenerThread extends Thread {
 		                    dos.write(read);
 		                }
 		                System.out.println("Sent File #" + (i+1) + ": " + name);
-		    		} 
-
-
-//	       
-	    		} else {
-	    			dos.writeInt(0);
-	    		}
-	    		
-	    		
+		    		}
+		    		
+		    		dos.flush();
+		    		
+		    		System.out.println(dos.size());
+		    		
+	    		}	    		
 			} catch (Exception e) {
-				System.out.println("Couldnt add ");
-			}//adds new connection to list of connections 
+				System.out.println("Couldn't add new connection!");
+			}
 			
 			if(connections.size() > 1){
 				for(Socket c : connections) {

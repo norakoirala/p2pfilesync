@@ -63,12 +63,12 @@ public class Sender {
             //names file, sends it + confirmation
            
             dos.writeUTF("File");
-//            dos.writeInt(1);
-           
+            dos.writeInt(1);
             dos.writeLong(myFile.lastModified());
-            dos.writeUTF(myFile.getName()); 
             dos.writeLong(myFile.length());
-    
+            dos.writeUTF(myFile.getName()); 
+            
+        
             int read;
             while((read = bis.read()) > -1) { 
                 dos.write(read);
@@ -148,21 +148,15 @@ public class Sender {
 		        System.out.println(ev.kind());
 		        this.connections = lt.connections;
 		        lt.kill();
-		        if(StandardWatchEventKinds.ENTRY_CREATE == ev.kind()) {         
+		        if(StandardWatchEventKinds.ENTRY_CREATE == ev.kind() || StandardWatchEventKinds.ENTRY_MODIFY == ev.kind() ) {         
 		        	String s = filename.toString();
            
            
             
 	            try{
-	              
-	                 System.out.println("Entered try");
-                  
 	                SendThread thread = new SendThread(connections,s,n);
 	                thread.start();
 	                System.out.println("Accepted");
-	   
-	              
-	
 	            } catch (Exception e) {
 	               e.printStackTrace();
 	             }   
