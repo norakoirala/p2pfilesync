@@ -1,7 +1,11 @@
 package peertopeer;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -45,9 +49,52 @@ public class ListenerThread extends Thread {
 		//while there are no files changes, accept new connections 
 		while(!fileChange){
 			try {
-				System.out.println("Attempting to add");
+				//System.out.println("Attempting to add");
 				connections.add(tmp = server.accept());
 		        System.out.println("Added  new connection: " + tmp); //verifying new connection
+		        
+		        BufferedOutputStream os = new BufferedOutputStream(tmp.getOutputStream());
+	            DataOutputStream dos = new DataOutputStream(os);
+	        	
+		       
+	            //getting all the files from one folder 
+	        	File dir = new File("FileDrop/");
+	    		File[] fileList = dir.listFiles();
+	    		
+	    		//adding # of files to output stream
+	    		int numFiles = fileList.length;
+	    		if(numFiles > 0) {
+	    			dos.writeUTF("File");
+		    		dos.writeInt(numFiles);
+		    		System.out.println("Sending " + numFiles + " files...");
+		    		
+		    		//sending the files one by one
+		    		for(int i = 0; i < numFiles; i++) {
+		    			File f = fileList[i];
+		    			//adding meta data for each file
+		    			long time = f.lastModified();
+		    			dos.writeLong(time);
+		    			long length = f.length();
+		    			dos.writeLong(length);
+		    			String name = f.getName();
+		    			dos.writeUTF(name);
+		    			
+		    			//set up streams
+		        		FileInputStream fis = new FileInputStream(f);  
+		        		BufferedInputStream bis = new BufferedInputStream(fis);
+		        		System.out.println("Sending File #" + (i+1) + ": " + name);
+		    			
+		        		//write files
+		                int read;
+		                while((read = bis.read()) != -1) { 
+		                    dos.write(read);
+		                }
+		                System.out.println("Sent File #" + (i+1) + ": " + name);
+		    		}
+		    		
+		    		dos.flush();
+	    		} 
+	    		
 			} catch (Exception e) {
 				System.out.println("Couldnt add ");
 			}//adds new connection to list of connections 
@@ -67,7 +114,7 @@ public class ListenerThread extends Thread {
 						e.printStackTrace();
 					}
 				}          
-			}
+			} 
 		}
       }
 	/**

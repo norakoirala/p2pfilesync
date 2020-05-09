@@ -20,7 +20,7 @@ public class PeerToPeer {
 		     
 		Scanner in = new Scanner(System.in);
 		sNode n1 = new sNode(false);
-		System.out.println("F OR R?");
+		System.out.println("RIGHT OUTSIDE\n F OR R?");
 		String s = in.nextLine();
 		
 		if (s.charAt(0) == 'F') {
