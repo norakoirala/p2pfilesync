@@ -61,6 +61,7 @@ public class Sender {
             DataOutputStream dos = new DataOutputStream(os);
             
             //names file, sends it + confirmation
+            dos.writeUTF("File");
             dos.writeLong(myFile.lastModified());
             dos.writeUTF(myFile.getName()); 
             dos.writeLong(mybytearray.length);
@@ -192,9 +193,5 @@ public class Sender {
     
         return server;
     }
-    
-    public void bootStrap (  ) {
-        
-    }
-    
+  
 }
