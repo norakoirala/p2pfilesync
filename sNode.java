@@ -38,8 +38,8 @@ public class sNode {
     
    
     public void listen() throws Exception {
-       outgoing = new Sender(this);
-        outgoing.watch(outgoing.sender());
+		outgoing = new Sender(this);
+		outgoing.watch(outgoing.sender());
     }
     
     /**
@@ -48,13 +48,12 @@ public class sNode {
      */
     
     public void establish(){
-              System.out.println("Broken?");
+        System.out.println("Broken?");
         incoming = new Receiver();
         this.cl = incoming.client();
     }
 
     public void receive(Socket cl) throws Exception{
-        
         System.out.println("Broken?");
         incoming.acceptFile(cl);
     }

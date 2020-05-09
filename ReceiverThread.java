@@ -15,6 +15,7 @@ public class ReceiverThread extends Thread {
      ArrayList<String> IPList;
      ArrayList<Socket> incoming = new ArrayList<>();
      Socket bootstrap = null;
+     
      /**
       * Default constructor 
       */
@@ -28,63 +29,54 @@ public class ReceiverThread extends Thread {
       */
      public ReceiverThread (sNode sn) throws Exception {
       // The compiler creates the byte code equivalent of super ();
-      this.s = sn;
-
+    	 this.s = sn;
      }
      
      /**
       * Method runs the receive thread
       */
      public void run () {
-    
-          while(true){
-              try{
-                 
-                       
+    	 while(true){
+    		 try{      
                 if(bootstrap == null && !s.master)  {
-                    System.out.println("Error?");
-                            this.bootstrap = new Socket("25.150.162.62",4321);
+                    System.out.println("Bootstrap Node Connecting...");
+                    this.bootstrap = new Socket("25.150.162.62",4321);
+                    System.out.println("Bootstrap Node Connected!");
                 }
                  
                 if(bootstrap != null ) {
-                     try{
-                 
-                    System.out.println("Connection established\n" + bootstrap.toString());
-                
-             
-           DataInputStream dis = new DataInputStream(bootstrap.getInputStream());
-          // while(true){
-               
-                String ip = dis.readUTF();    
-               System.out.println("New obtained " + ip.substring(1,ip.length()));
-              incoming.add(new Socket(ip.substring(1,findColon(ip)),4321));
-                
-            //   incoming.add()
-                } catch (Exception e) {
-                  break;
+                	try{
+                    	System.out.println("Connection established\n" + bootstrap.toString());
+                    	DataInputStream dis = new DataInputStream(bootstrap.getInputStream());
+                    	String check = dis.readUTF();
+                    	if (check.equals("IP")) {
+    						String ip = dis.readUTF();    
+    						System.out.println("New obtained " + ip.substring(1,ip.length()));
+    						int i = ip.indexOf(":");
+    						if (i != -1) {incoming.add(new Socket(ip.substring(1, i), 4321)); }
+                    	}
+                	} catch (Exception e) {
+                		break;
+                	}
                 }
+                
+                for(Socket a : incoming) {
+                	System.out.println("Confirmed connection non bootstrap "  + a.toString());
                 }
-             for(Socket a : incoming) {
-                       System.out.println("Confirmed connection non bootstrap "  + a.toString());
-                      //       this.s.incoming.acceptFile(a);
-                    }
-       sleep(15000);
-            
-         // }
-       } catch ( Exception e) {
-           e.printStackTrace();
-       }
-              
-     }
-     
+                
+                sleep(15000);
+    		 } catch ( Exception e) {
+		       e.printStackTrace();
+    		 } 
+    	 }
      }
      
      
-    public int findColon(String s) {
-        for(int i = 0; i < s.length(); i++){
-            if(s.charAt(i) == ':') return i; 
-        }
-        return -1; 
-    }
-      
+//     public int findColon(String s) {
+//		for(int i = 0; i < s.length(); i++){
+//		    if(s.charAt(i) == ':') return i; 
+//		}
+//		return -1; 
+//    }
+//      
 }
