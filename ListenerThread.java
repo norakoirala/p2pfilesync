@@ -49,7 +49,7 @@ public class ListenerThread extends Thread {
 		//while there are no files changes, accept new connections 
 		while(!fileChange){
 			try {
-				//System.out.println("Attempting to add");
+				System.out.println("Attempting to add");
 				connections.add(tmp = server.accept());
 		        System.out.println("Added  new connection: " + tmp); //verifying new connection
 		        
@@ -74,10 +74,13 @@ public class ListenerThread extends Thread {
 		    			//adding meta data for each file
 		    			long time = f.lastModified();
 		    			dos.writeLong(time);
-		    			long length = f.length();
-		    			dos.writeLong(length);
 		    			String name = f.getName();
 		    			dos.writeUTF(name);
+		    			long length = f.length();
+		    			dos.writeLong(length);
+		    			
+		    		
+		    			
 		    			
 		    			//set up streams
 		        		FileInputStream fis = new FileInputStream(f);  
@@ -86,14 +89,18 @@ public class ListenerThread extends Thread {
 		    			
 		        		//write files
 		                int read;
-		                while((read = bis.read()) != -1) { 
+		                while((read = bis.read()) > -1) { 
 		                    dos.write(read);
 		                }
 		                System.out.println("Sent File #" + (i+1) + ": " + name);
-		    		}
-		    		
-		    		dos.flush();
-	    		} 
+		    		} 
+
+
+//	       
+	    		} else {
+	    			dos.writeInt(0);
+	    		}
+	    		
 	    		
 			} catch (Exception e) {
 				System.out.println("Couldnt add ");

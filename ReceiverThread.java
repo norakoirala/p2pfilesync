@@ -48,68 +48,67 @@ public class ReceiverThread extends Thread {
  			if(bootstrap == null && !s.master)  {
 				System.out.println("Bootstrap Node Connecting...");
 				this.bootstrap = new Socket("25.124.176.158",4321);
-				System.out.println("Bootstrap Node:" + bootstrap + "Connected!");
-			        	//setting up streams to accept files
-			            BufferedInputStream bis = new BufferedInputStream(bootstrap.getInputStream());
-			            DataInputStream dis = new DataInputStream(bis);
-			            
-			            //Makes directory to put files in
-			            File dir = new File("FileDrop");
-			            if(!dir.exists()) dir.mkdir();
-			            
-			          
-			            //Receiving number of files
-			            String file = dis.readUTF();
-			            System.out.println(file);
-			            if (file.equals("File")) {
-				            int numFiles = dis.readInt();
-				            System.out.println(numFiles);
-				            if(numFiles > 0) {
-				            	 System.out.println("Receiving " + numFiles + " files...");
-						            
-						            //Writing each file
-						            for (int i = 0; i < numFiles; i++) {
-						            	//receiving metadata
-						    
-						            		long time = dis.readLong();
-							            	String name = dis.readUTF();
-							            	long length = dis.readLong();
-							            	
-							            	//creating file
-							            	File tmp = new File("FileDrop/" + name);
-							            	System.out.println("Receiving File #" + (i+1) + ": " + name);
-							            	
-							            	//checking duplicates
-							                if(tmp.exists() && (tmp.lastModified() >= time)) {
-							        			System.out.println("Most recent version of:" + name + " already exists!");
-							                } else {
-							                    //Receives file + confirmation 
-							                    tmp.setLastModified(time);
-							                    FileOutputStream fos = new FileOutputStream("FileDrop/" + name, false);
-							                    BufferedOutputStream bos = new BufferedOutputStream(fos);
-							                    //byte[] buffer = new byte[bufferSize];
-							                    int read = 0;
-							                    while(read < length) {
-							                        bos.write(bis.read());
-							                        read++;
-							                    }
-							                    bos.flush();
-							                    System.out.println("Received File #" + (i+1) + ": " + name);
-							                }
-						            	}
-			            }
-			    
-
-					            	
-					            
-			            } 
+				System.out.println("Bootstrap Node:" + bootstrap + "Connected!");         
+	            BufferedInputStream bis = new BufferedInputStream(bootstrap.getInputStream());
+	            DataInputStream dis = new DataInputStream(bis);
+	          
+	            //Makes directory to put files in
+	            File dir = new File("FileDrop");
+	            if(!dir.exists()) dir.mkdir();
+	            
+	            System.out.println(dis.available());
+	
+	            String s = dis.readUTF();
+	            System.out.println("here2");
+	            System.out.println(s);
+	            
+	            if(s.equals("File")) {
+	            //Receiving number of files
+	            int numFiles = dis.readInt();
+	            System.out.println("Receiving " + numFiles + " files...");
+	            
+	            //Writing each file
+	            for (int i = 0; i < numFiles; i++) {
+	            	//receiving metadata
+	            	long time = dis.readLong();
+	            	long length = dis.readLong();
+	            	String name = dis.readUTF();
+	            	
+	            	//creating file
+	            	File tmp = new File("FileDrop/" + name);
+	            	System.out.println("Receiving File #" + (i+1) + ": " + name);
+	            	
+	            	//checking duplicates
+	                if(tmp.exists() && (tmp.lastModified() <= time)) {
+            			System.out.println("Updating file " + name);
+                    } 
+                     
+	                    //Receives file + confirmation 
+	                    
+	                    FileOutputStream fos = new FileOutputStream("FileDrop/" + name);
+	                    BufferedOutputStream bos = new BufferedOutputStream(fos);
+	                    //byte[] buffer = new byte[bufferSize];
+	                    int read = 0;
+	                    while(read < length) {
+	                        bos.write(bis.read());
+	                        read++;
+	                    }
+	                    
+	                    bos.flush();
+	                    System.out.println("Received File #" + (i+1) + ": " + name);
+	                    tmp.setLastModified(time);
+	              
+	                
+	             
+	            } 
+	            }
 		            }
 
 	    	 } catch (Exception e) {
 	    		 e.printStackTrace();
     	 }
     	 
-    	 System.out.println("hello");
+//    	 System.out.println("hello");
 
     	 while(true){
     		 try{                  
@@ -138,12 +137,11 @@ public class ReceiverThread extends Thread {
                                 if(!dir.exists()) dir.mkdir();
                                 File tmp = new File("FileDrop/" + fileName);
                                 
-                                
-                                System.out.println("File in dir: " + tmp.lastModified() + "\nFile coming in : " + time);
                                 //Handles duplicate files 
-                                if(tmp.exists() && (tmp.lastModified() >= time)) {
-                        			System.out.println("Most recent version of:" + fileName + " already exists!");
-                                } else {
+                                if(tmp.exists() && (tmp.lastModified() <= time)) {
+                        			System.out.println("Updating file " + fileName);
+                                } 
+                                
                                     //Receives file + confirmation 
                                 	int bufferSize = (int) dis.readLong();
                                     OutputStream output = new FileOutputStream("FileDrop/" + fileName);
@@ -156,7 +154,7 @@ public class ReceiverThread extends Thread {
                                     System.out.println("Received File: " + fileName);
                                     tmp.setLastModified(time);
                                 }
-                    	}
+                    	
                 	} catch (Exception e) {
                 		break;
                 	}
@@ -187,14 +185,14 @@ public class ReceiverThread extends Thread {
                             if(!dir.exists()) dir.mkdir();
                             File tmp = new File("FileDrop/" + fileName);
                             
-                            
-                            System.out.println("File in dir: " + tmp.lastModified() + "\nFile coming in : " + time);
+                           
                             //Handles duplicate files 
-                            if(tmp.exists() && (tmp.lastModified() >= time)) {
-                    			System.out.println("Most recent version of:" + fileName + " already exists!");
-                            } else {
+                            if(tmp.exists() && (tmp.lastModified() <= time)) {
+                    			System.out.println("Updating file: " + fileName);
+                            } 
+                            
                                 //Receives file + confirmation 
-                                OutputStream output = new FileOutputStream("JavaP2P/" + fileName);
+                                OutputStream output = new FileOutputStream("File Drop/" + fileName);
                                 byte[] buffer = new byte[bufferSize];
                                 int read;
                                 while((read = clientData.read(buffer)) != 1){
@@ -203,7 +201,7 @@ public class ReceiverThread extends Thread {
                                 output.flush();
                                 System.out.println("Received File: " + fileName);
                                 tmp.setLastModified(time);
-                            }
+                            
                             
                         }
                     } catch (IOException e) {
@@ -219,11 +217,6 @@ public class ReceiverThread extends Thread {
      }
      
      
-//     public int findColon(String s) {
-//		for(int i = 0; i < s.length(); i++){
-//		    if(s.charAt(i) == ':') return i; 
-//		}
-//		return -1; 
-//    }
+
 //      
 }
