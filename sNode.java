@@ -55,7 +55,6 @@ public class sNode {
 
     public void receive(Socket s) throws Exception{
     	this.incoming = new Receiver();
-        System.out.println("R: " + s);
         incoming.acceptFile(cl);
     }
     
