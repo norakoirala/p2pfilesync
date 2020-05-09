@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 public class ReceiverThread extends Thread {
 	
-     sNode s; //the node that receives the file
+     sNode s;
      ArrayList<String> IPList;
      ArrayList<Socket> incoming = new ArrayList<>();
      Socket bootstrap = null;
@@ -46,40 +46,45 @@ public class ReceiverThread extends Thread {
      public void run () {
     	 try {
  			if(bootstrap == null && !s.master)  {
+ 				//connects to the bootstrap node
 				System.out.println("Bootstrap Node Connecting...");
 				this.bootstrap = new Socket("25.124.176.158",4321);
-				System.out.println("Bootstrap Node:" + bootstrap + "Connected!");         
+				System.out.println("Connected to Bootstrap Node: " + bootstrap);    
+				
+				//prepares to receive files
 	            BufferedInputStream bis = new BufferedInputStream(bootstrap.getInputStream());
 	            DataInputStream dis = new DataInputStream(bis);
 	          
 	            //Makes directory to put files in
 	            File dir = new File("FileDrop");
 	            if(!dir.exists()) dir.mkdir();
-	         
+	            String check = dis.readUTF();
+	            System.out.println(check);
 
-	            if(s.equals("File")) {
+	            //accepts all files that bootstrap has
+	            if(check.equals("File")) {
+	            	
 	            //Receiving number of files
 	            int numFiles = dis.readInt();
 	            System.out.println("Receiving " + numFiles + " files...");
 	            
-	            //Writing each file
-	            for (int i = 0; i < numFiles; i++) {
-	            	//receiving metadata
-	            	long time = dis.readLong();
-	            	long length = dis.readLong();
-	            	String name = dis.readUTF();
-	            	
-	            	//creating file
-	            	File tmp = new File("FileDrop/" + name);
-	            	System.out.println("Receiving File #" + (i+1) + ": " + name);
-	            	
-	            	//checking duplicates
-	                if(tmp.exists() && (tmp.lastModified() <= time)) {
-            			System.out.println("Updating file " + name);
-                    } 
-                     
+	            	//Writing each file
+		            for (int i = 0; i < numFiles; i++) {
+		            	//receiving metadata
+		            	long time = dis.readLong();
+		            	long length = dis.readLong();
+		            	String name = dis.readUTF();
+		            	
+		            	//creating file
+		            	File tmp = new File("FileDrop/" + name);
+		            	System.out.println("Receiving File #" + (i+1) + ": " + name);
+		            	
+		            	//checking duplicates
+		                if(tmp.exists() && (tmp.lastModified() <= time)) {
+	            			System.out.println("Updating file: " + name);
+	                    } 
+	                     
 	                    //Receives file + confirmation 
-	                    
 	                    FileOutputStream fos = new FileOutputStream("FileDrop/" + name);
 	                    BufferedOutputStream bos = new BufferedOutputStream(fos);
 	                    //byte[] buffer = new byte[bufferSize];
@@ -92,65 +97,59 @@ public class ReceiverThread extends Thread {
 	                    bos.flush();
 	                    System.out.println("Received File #" + (i+1) + ": " + name);
 	                    tmp.setLastModified(time);
-	              
-	                
-	             
-	            } 
+	            	} 
 	            }
-		            }
-
-	    	 } catch (Exception e) {
+            }
+    	 } catch (Exception e) {
 	    		 e.printStackTrace();
     	 }
     	 
-//    	 System.out.println("hello");
-
     	 while(true){
     		 try{                  
                 if(bootstrap != null ) {
                 	try{
-                    	System.out.println("Connection established\n" + bootstrap.toString());
+                    	System.out.println("Bootstrap Node: " + bootstrap.toString());
                     	BufferedInputStream bis = new BufferedInputStream(bootstrap.getInputStream());
                     	DataInputStream dis = new DataInputStream(bis);
                     	String check = dis.readUTF();
-                    	if (check.equals("IP")) {
+                    	if (check.equals("IP")) { //receives IP from bootstrap 
     						String ip = dis.readUTF();    
-    						System.out.println("New obtained " + ip.substring(1,ip.length()));
+    						System.out.println("New connection obtained " + ip.substring(1,ip.length()));
     						int i = ip.indexOf(":");
     						if (i != -1) {incoming.add(new Socket(ip.substring(1, i), 4321)); }
-                    	} else if (check.equals("File")) {
+                    	} else if (check.equals("File")) { //receives file from bootstrap
                         	//initialize components
-                    			int files = dis.readInt();
-                            	long time = dis.readLong();
-                            	 
-                                //Displays file name
-                            	
-                                String fileName = dis.readUTF();
-                                System.out.println("Recieving" + files + "File: " + fileName);
-                                
-                                //Makes directory + creates file
-                                File dir = new File("FileDrop");
-                                if(!dir.exists()) dir.mkdir();
-                                File tmp = new File("FileDrop/" + fileName);
-                                
-                                //Handles duplicate files 
-                                if(tmp.exists() && (tmp.lastModified() <= time)) {
-                        			System.out.println("Updating file " + fileName);
-                                } 
-                                
-                                    //Receives file + confirmation 
-                                	int bufferSize = (int) dis.readLong();
-                                    OutputStream output = new FileOutputStream("FileDrop/" + fileName);
-                                    byte[] buffer = new byte[bufferSize];
-                                    int read;
-                                    while((read = dis.read(buffer)) != 1){
-                                        output.write(buffer, 0, read);
-                                    }
-                                    output.flush();
-                                    System.out.println("Received File: " + fileName);
-                                    tmp.setLastModified(time);
-                                }
-                    	
+                			int files = dis.readInt();
+                        	long time = dis.readLong();
+                        	 
+                            //Displays file name
+                            String fileName = dis.readUTF();
+                            System.out.println("Recieving " + files + "File: " + fileName);
+                            
+                            //Makes directory + creates file
+                            File dir = new File("FileDrop");
+                            if(!dir.exists()) dir.mkdir();
+                            File tmp = new File("FileDrop/" + fileName);
+                            
+                            //Handles duplicate files 
+                            if(tmp.exists() && (tmp.lastModified() <= time)) {
+                    			System.out.println("Updating file " + fileName);
+                            } 
+                            
+                            //Receives file + confirmation 
+                        	int bufferSize = (int) dis.readLong();
+                            OutputStream output = new FileOutputStream("FileDrop/" + fileName);
+                            byte[] buffer = new byte[bufferSize];
+                            int read;
+                            
+                            while((read = dis.read(buffer)) != 1){
+                                output.write(buffer, 0, read);
+                            }
+                            
+                            output.flush();
+                            System.out.println("Received File: " + fileName);
+                            tmp.setLastModified(time);
+                        }
                 	} catch (Exception e) {
                 		break;
                 	}
@@ -164,14 +163,10 @@ public class ReceiverThread extends Thread {
                         int bufferSize = a.getReceiveBufferSize(); 
                         InputStream in = a.getInputStream();
                         DataInputStream clientData = new DataInputStream(in);
-                        String s = clientData.readUTF();
-                        
-                        System.out.println("Here accepting file: " + s);
-                        
-                        if(s.equals("File")) {
+                        String check = clientData.readUTF();
+
+                        if(check.equals("File")) { //receives file from other nodes
                         	long time = clientData.readLong();
-                        	   
-                            
                             //Displays file name
                             String fileName = clientData.readUTF();
                             System.out.println("Recieving File: " + fileName);
@@ -187,32 +182,25 @@ public class ReceiverThread extends Thread {
                     			System.out.println("Updating file: " + fileName);
                             } 
                             
-                                //Receives file + confirmation 
-                                OutputStream output = new FileOutputStream("File Drop/" + fileName);
-                                byte[] buffer = new byte[bufferSize];
-                                int read;
-                                while((read = clientData.read(buffer)) != 1){
-                                    output.write(buffer, 0, read);
-                                }
-                                output.flush();
-                                System.out.println("Received File: " + fileName);
-                                tmp.setLastModified(time);
-                            
-                            
+                            //Receives file + confirmation 
+                            OutputStream output = new FileOutputStream("File Drop/" + fileName);
+                            byte[] buffer = new byte[bufferSize];
+                            int read;
+                            while((read = clientData.read(buffer)) != 1){
+                                output.write(buffer, 0, read);
+                            }
+                            output.flush();
+                            System.out.println("Received File: " + fileName);
+                            tmp.setLastModified(time);
                         }
                     } catch (IOException e) {
                     	e.printStackTrace();
                     }
                 }
-
                 sleep(500);
     		 } catch (Exception e) {
 		       e.printStackTrace();
     		 } 
     	 }
      }
-     
-     
-
-//      
 }
