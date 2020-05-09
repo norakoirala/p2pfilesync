@@ -53,15 +53,11 @@ public class Receiver {
     public void acceptFile(Socket socket) throws Exception {
         try {        	
         	//initialize components
-        	System.out.println("incoming from: " + socket);
             int bufferSize = socket.getReceiveBufferSize(); 
             InputStream in = socket.getInputStream();
             DataInputStream clientData = new DataInputStream(in);
-            String s = clientData.readUTF();
             
-            System.out.println("Here accepting file: " + s);
-            
-            if(s.equals("File")) {
+            if(clientData.readUTF().equals("File")) {
             	long time = clientData.readLong();
             	   
                 

@@ -19,7 +19,7 @@ public class PeerToPeer {
 		// TODO code application logic here
 		     
 		Scanner in = new Scanner(System.in);
-		sNode n1 = new sNode(false);
+		sNode n1 = new sNode(true);
 		System.out.println("F OR R?");
 		String s = in.nextLine();
 		

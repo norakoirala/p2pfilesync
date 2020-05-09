@@ -49,11 +49,11 @@ public class Sender {
      */
     public void send(Socket socket, String filename) throws Exception {
     	try {
-        	System.out.println("Sending...");
+        	System.out.println("Sending File: " + filename + " to" + socket);
         	
         	//initialize components
         	final File myFile = new File("FileDrop/" + filename); //sdcard/DCIM.JPG 
-    		byte[] mybytearray = new byte[(int)myFile.length()];
+
     		FileInputStream fis = new FileInputStream(myFile);  
     		BufferedInputStream bis = new BufferedInputStream(fis);
     		DataInputStream dis = new DataInputStream(bis);
@@ -61,17 +61,19 @@ public class Sender {
             DataOutputStream dos = new DataOutputStream(os);
             
             //names file, sends it + confirmation
+           
             dos.writeUTF("File");
+            dos.writeInt(1);
             dos.writeLong(myFile.lastModified());
+            dos.writeLong(myFile.length());
             dos.writeUTF(myFile.getName()); 
-            dos.writeLong(mybytearray.length);
             int read;
-            while((read = dis.read(mybytearray)) != -1){
-                dos.write(mybytearray, 0, read);
+            while((read = bis.read()) > -1) { 
+                dos.write(read);
             }
 			dos.writeByte(-1);
 			dos.flush();
-			System.out.println("Sent!");
+			System.out.println(filename + " sent to " + socket);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -48,7 +48,6 @@ import java.util.ArrayList;
 		try{
 			for(Socket s : connections){ //sends file to connections
 				this.s.outgoing.send(s,fileName); 
-				System.out.println("Sending to... " +  s);
 			}
        } catch ( Exception e) {
            e.printStackTrace();

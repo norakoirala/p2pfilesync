@@ -48,14 +48,13 @@ public class sNode {
      */
     
     public void establish(){
-        System.out.println("E");
+        System.out.println("Broken?");
         incoming = new Receiver();
         this.cl = incoming.client();
     }
 
-    public void receive(Socket s) throws Exception{
-    	this.incoming = new Receiver();
-        System.out.println("R: " + s);
+    public void receive(Socket cl) throws Exception{
+    	incoming = new Receiver();
         incoming.acceptFile(cl);
     }
     
