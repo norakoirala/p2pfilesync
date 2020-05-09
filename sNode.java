@@ -13,7 +13,6 @@ import java.util.ArrayList;
 public class sNode {
 	
     Sender outgoing; 
-    Receiver incoming;
     Socket cl;
     int nodeNum;
     Socket bootstrap;
@@ -46,18 +45,5 @@ public class sNode {
      * Method receives files
      * @throws Exception
      */
-    
-    public void establish(){
-        System.out.println("E");
-        incoming = new Receiver();
-        this.cl = incoming.client();
-    }
 
-    public void receive(Socket s) throws Exception{
-    	this.incoming = new Receiver();
-        incoming.acceptFile(cl);
-    }
-    
-
-    
 }
