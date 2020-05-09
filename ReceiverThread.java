@@ -55,13 +55,8 @@ public class ReceiverThread extends Thread {
 	            //Makes directory to put files in
 	            File dir = new File("FileDrop");
 	            if(!dir.exists()) dir.mkdir();
-	            
-	            System.out.println(dis.available());
-	
-	            String s = dis.readUTF();
-	            System.out.println("here2");
-	            System.out.println(s);
-	            
+	         
+
 	            if(s.equals("File")) {
 	            //Receiving number of files
 	            int numFiles = dis.readInt();
@@ -125,12 +120,13 @@ public class ReceiverThread extends Thread {
     						if (i != -1) {incoming.add(new Socket(ip.substring(1, i), 4321)); }
                     	} else if (check.equals("File")) {
                         	//initialize components
+                    			int files = dis.readInt();
                             	long time = dis.readLong();
-                            	   
-                               
+                            	 
                                 //Displays file name
+                            	
                                 String fileName = dis.readUTF();
-                                System.out.println("Recieving File: " + fileName);
+                                System.out.println("Recieving" + files + "File: " + fileName);
                                 
                                 //Makes directory + creates file
                                 File dir = new File("FileDrop");
