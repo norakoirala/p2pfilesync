@@ -19,11 +19,22 @@ public class PeerToPeer {
 		// TODO code application logic here
 		     
 		Scanner in = new Scanner(System.in);
-		sNode n1 = new sNode(true);
-		System.out.println("F OR R?");
+		sNode n1 = null;
+		System.out.println("Are you the bootstrap node? (Y/N)");
 		String s = in.nextLine();
+		if (s.charAt(0) == 'Y') {
+			n1 = new sNode(true);
+		} else if (s.charAt(0) == 'N') {
+			n1 = new sNode(false);
+		} else {
+			System.out.println("Invalid input!");
+		}
+	
 		
-		if (s.charAt(0) == 'F') {
+		
+		System.out.println("Start Sending (S) or Start Receiving (R)?");
+		s = in.nextLine();
+		if (s.charAt(0) == 'S') {
 			new FolderThread(n1).start();
 		} else if (s.charAt(0) == 'R') {
 			new ReceiverThread(n1).start(); 

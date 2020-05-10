@@ -94,7 +94,7 @@ public class ListenerThread extends Thread {
 		    		
 		    		dos.flush();
 		    		
-		    		System.out.println(dos.size());
+//		    		System.out.println(dos.size());
 		    		
 	    		}	    		
 			} catch (Exception e) {

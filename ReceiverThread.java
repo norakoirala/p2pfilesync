@@ -150,7 +150,7 @@ public class ReceiverThread extends Thread {
                             tmp.setLastModified(time);
                         }
                 	} catch (Exception e) {
-                		break;
+                		e.printStackTrace();
                 	}
                 }
                 
