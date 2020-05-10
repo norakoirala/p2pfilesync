@@ -2,7 +2,9 @@ package peertopeer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 /**
@@ -23,10 +25,13 @@ public class sNode {
     /**
      * Overloaded constructor
      * @param n - number for the node
+     * @throws IOException 
+     * @throws UnknownHostException 
      */
  
-    public sNode(boolean m){
+    public sNode(boolean m) throws UnknownHostException, IOException{
         this.master = m;
+
     }
     
     

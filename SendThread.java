@@ -46,8 +46,11 @@ import java.util.ArrayList;
 	 */
 	public void run () {
 		try{
-			for(Socket s : connections){ //sends file to connections
-				this.s.outgoing.send(s,fileName); 
+			System.out.println(connections.toString());
+			for(Socket so : connections){ //sends file to connections
+				if(s.bootstrap.getInetAddress().toString() != so.getInetAddress().toString()) {
+					this.s.outgoing.send(so,fileName); 
+				}
 			}
        } catch ( Exception e) {
            e.printStackTrace();

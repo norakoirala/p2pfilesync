@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,8 +36,10 @@ public class Sender {
 	/**
 	 * Overloaded constructor
 	 * @param s - the node sending the file
+	 * @throws IOException 
+	 * @throws UnknownHostException 
 	 */
-    public Sender(sNode s){
+    public Sender(sNode s) throws UnknownHostException, IOException{
         this.n = s;  
         connections = new ArrayList<Socket>();
     }
@@ -102,7 +105,7 @@ public class Sender {
         OutputStream out = null;
         
         for (;;) {
-        	ListenerThread lt = new ListenerThread(connections,socket);
+        	ListenerThread lt = new ListenerThread(connections,socket, n);
         	lt.start();
     
                 
